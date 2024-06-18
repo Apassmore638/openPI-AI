@@ -2,12 +2,13 @@ import tkinter as tk
 from tkinter import scrolledtext
 from interpreter import interpreter
 
-# Configure the interpreter to use Azure OpenAI Service
-interpreter.llm.api_key = '...'
-interpreter.llm.api_base = '...'
-interpreter.llm.api_type = '...'
-interpreter.llm.api_version = '...'  # or the version you are using
-interpreter.llm.model = '...'
+# Configure the interpreter to use Azure OpenAI Service with environment variables
+import os
+interpreter.llm.api_key = os.getenv('AZURE_API_KEY')
+interpreter.lll.api_base = os.getenv('AZURE_API_BASE')
+interpreter.llm.api_type = os.getenv('AZURE_API_TYPE')
+interpreter.llm.api_version = os.getenv('AZURE_API_VERSION')
+interpreter.llm.model = os.getenv('AZURE_MODEL')
 interpreter.llm.supports_vision = True  # Enable vision support
 
 
