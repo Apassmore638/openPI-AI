@@ -4,7 +4,7 @@ import plistlib
 import sqlite3
 import subprocess
 import time
-
+import platform
 
 class SMS:
     def __init__(self, computer):
@@ -12,9 +12,12 @@ class SMS:
         self.database_path = self.resolve_database_path()
 
     def resolve_database_path(self):
-        if os.geteuid() == 0:  # Running as root
-            home_directory = os.path.expanduser(f"~{os.environ.get('SUDO_USER')}")
-        else:
+        if platform.system() == 'Linux' or platform.system() == 'Darwin':
+            if os.geteuid() == 0:  # Running as root
+                home_directory = os.path.expanduser(f"~{os.environ.get('SUDO_USER')}")
+            else:
+                home_directory = os.path.expanduser("~")
+        else:  # For Windows and other OS
             home_directory = os.path.expanduser("~")
         return f"{home_directory}/Library/Messages/chat.db"
 
