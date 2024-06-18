@@ -1,3 +1,4 @@
+
 import tkinter as tk
 from tkinter import scrolledtext
 from interpreter import interpreter
@@ -11,17 +12,20 @@ interpreter.llm.api_version = os.getenv('AZURE_API_VERSION')
 interpreter.llm.model = os.getenv('AZURE_MODEL')
 interpreter.llm.supports_vision = True  # Enable vision support
 
-
 def send_message():
     user_input = input_box.get("1.0", tk.END).strip()
     if user_input:
         chat_window.config(state=tk.NORMAL)
         chat_window.insert(tk.END, "You: " + user_input + "\n")
+        chat_window.insert(tk.END, "Bot: thinking...\n")  # Add the"thinking..." indicator
         chat_window.config(state=tk.DISABLED)
         input_box.delete("1.0", tk.END)
+
+        root.update()  # Refresh the GUI to show "thinking..."
         
         response = get_interpreter_response(user_input)
         chat_window.config(state=tk.NORMAL)
+        chat_window.delete("end-2l", "end-1l")  # Remove "thinking..."
         chat_window.insert(tk.END, "Bot: " + response + "\n")
         chat_window.config(state=tk.DISABLED)
         chat_window.yview(tk.END)
@@ -63,3 +67,4 @@ interrupt_button.pack(padx=10, pady=10, side=tk.RIGHT)
 
 # Run the application
 root.mainloop()
+    
