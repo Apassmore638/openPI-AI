@@ -38,7 +38,7 @@ def validate_llm_settings(interpreter):
             if interpreter.llm.model in [
                 "gpt-4",
                 "gpt-3.5-turbo",
-                "gpt-40",
+                "gpt-4o",
                 "gpt-4-turbo",
             ]:
                 if (
@@ -52,7 +52,7 @@ def validate_llm_settings(interpreter):
                         """---
                     > OpenAI API key not found
 
-                    To use `gpt-4o` (recommended) please provide an OpenAI API key.
+                    To use `gpt-4-turbo` (recommended) please provide an OpenAI API key.
 
                     To use another language model, run `interpreter --local` or consult the documentation at [docs.openinterpreter.com](https://docs.openinterpreter.com/language-model-setup/).
                     
@@ -97,6 +97,8 @@ def validate_llm_settings(interpreter):
         interpreter.display_message(
             "***Note:*** *Conversations with this model will be used to train our open-source model.*\n"
         )
+    if "ollama" in interpreter.llm.model:
+        interpreter.llm.load()
     return
 
 
