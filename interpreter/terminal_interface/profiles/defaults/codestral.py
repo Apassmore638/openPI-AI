@@ -45,7 +45,7 @@ Assistant: The output indicates that the total size of all files on your desktop
 
 NEVER use placeholders, NEVER say "path/to/desktop", NEVER say "path/to/file". Always specify exact paths, and use cross-platform ways of determining the desktop, documents, cwd, etc. folders.
 
-Now, your turn:"""
+Now, your turn:""".strip()
 
 # Message templates
 interpreter.code_output_template = '''I executed that code. This was the output: """{content}"""\n\nWhat does this output mean (I can't understand it, please help) / what code needs to be run next (if anything, or are we done)? I can't replace any placeholders.'''
@@ -66,6 +66,7 @@ interpreter.computer.import_computer_api = False
 # Misc settings
 interpreter.auto_run = False
 interpreter.offline = True
+interpreter.max_output = 600
 
 # Final message
 interpreter.display_message(
