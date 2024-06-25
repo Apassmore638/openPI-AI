@@ -15,12 +15,12 @@ args = parser.parse_args()
 
 # Configure the interpreter to use Azure OpenAI Service with environment variables
 import os
-interpreter.llm.api_key = os.getenv('AZURE_API_KEY')
-interpreter.llm.api_base = os.getenv('AZURE_API_BASE')
-interpreter.llm.api_type = os.getenv('AZURE_API_TYPE')
-interpreter.llm.api_version = os.getenv('AZURE_API_VERSION')
-interpreter.llm.model = os.getenv('AZURE_MODEL')
-interpreter.llm.supports_vision = True  # Enable vision support
+interpreter.llm.api_key = os.getenv('API_KEY')
+interpreter.llm.api_base = os.getenv('API_BASE')
+interpreter.llm.api_type = os.getenv('API_TYPE')
+interpreter.llm.api_version = os.getenv('API_VERSION')
+interpreter.llm.model = os.getenv('MODEL')
+interpreter.llm.supports_vision = os.getenv('SUPPORTS_VISION', 'False').lower() in ('true', '1', 't')
 
 # Set the operating system if provided
 if args.os:
