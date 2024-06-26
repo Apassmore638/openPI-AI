@@ -19,7 +19,6 @@ interpreter.llm.api_base = os.getenv('API_BASE')
 interpreter.llm.api_type = os.getenv('API_TYPE')
 interpreter.llm.api_version = os.getenv('API_VERSION')
 interpreter.llm.model = os.getenv('MODEL')
-interpreter.llm.supports_vision = os.getenv('SUPPORTS_VISION', 'False').lower() in ('true', '1', 't')
 
 # Print the model to ensure it is set correctly
 print(f"Model set to: {interpreter.llm.model}")
