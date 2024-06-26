@@ -6,7 +6,7 @@ import speech_recognition as sr
 import threading
 import pyttsx3
 import argparse
-import keyboard
+from pynput import keyboard as pynput_keyboard
 
 # Argument parsing
 parser = argparse.ArgumentParser(description="Open Interpreter Chat UI")
@@ -88,6 +88,13 @@ def recognize_speech():
 def start_recognition_thread():
     threading.Thread(target=recognize_speech).start()
 
+def on_press(key):
+    try:
+        if key == pynput_keyboard.Key.ctrl_r:
+            start_recognition_thread()
+    except AttributeError:
+        pass
+
 # Set up the main application window
 root = tk.Tk()
 root.title("Chat UI")
@@ -116,8 +123,9 @@ tts_var = tk.BooleanVar()
 tts_checkbox = tk.Checkbutton(root, text="Enable Text-to-Speech", variable=tts_var)
 tts_checkbox.pack(padx=10, pady=10)
 
-# Set up a global hotkey for speech recognition
-keyboard.add_hotkey('right ctrl', start_recognition_thread)
+# Set up the hotkey listener using pynput
+listener = pynput_keyboard.Listener(on_press=on_press)
+listener.start()
 
 # Run the application
 root.mainloop()
