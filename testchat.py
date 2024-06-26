@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import scrolledtext
 from interpreter import interpreter
-import os
 import speech_recognition as sr
 import threading
+import os
 import pyttsx3
 import argparse
-import keyboard
+import keyboard  # Using keyboard library for key bindings
 
 # Argument parsing
 parser = argparse.ArgumentParser(description="Open Interpreter Chat UI")
@@ -14,13 +14,15 @@ parser.add_argument('--os', type=str, help='Specify the operating system')
 args = parser.parse_args()
 
 # Configure the interpreter to use Azure OpenAI Service with environment variables
-import os
 interpreter.llm.api_key = os.getenv('API_KEY')
 interpreter.llm.api_base = os.getenv('API_BASE')
 interpreter.llm.api_type = os.getenv('API_TYPE')
 interpreter.llm.api_version = os.getenv('API_VERSION')
 interpreter.llm.model = os.getenv('MODEL')
-interpreter.llm.supports_vision = True
+interpreter.llm.supports_vision = os.getenv('SUPPORTS_VISION', 'False').lower() in ('true', '1', 't')
+
+# Print the model to ensure it is set correctly
+print(f"Model set to: {interpreter.llm.model}")
 
 # Set the operating system if provided
 if args.os:
@@ -29,7 +31,7 @@ if args.os:
 # Initialize text-to-speech engine
 tts_engine = pyttsx3.init()
 
-def send_message():
+def send_message(event=None):  # Modified to accept an optional event parameter
     user_input = input_box.get("1.0", tk.END).strip()
     if user_input:
         chat_window.config(state=tk.NORMAL)
@@ -95,29 +97,37 @@ root.title("Chat UI")
 # Bind Ctrl+C to the interrupt function
 root.bind('<Control-c>', interrupt)
 
+# Create a frame to hold the chat window and the input box
+main_frame = tk.Frame(root)
+main_frame.pack(fill=tk.BOTH, expand=True)
+
 # Create a scrolled text widget for the chat window
-chat_window = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED)
+chat_window = scrolledtext.ScrolledText(main_frame, wrap=tk.WORD, state=tk.DISABLED)
 chat_window.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
 # Create a text widget for user input
-input_box = tk.Text(root, height=3)
+input_box = tk.Text(main_frame, height=3)
 input_box.pack(padx=10, pady=10, fill=tk.X, expand=False)
 
+# Bind the Enter key to send_message
+keyboard.add_hotkey('enter', send_message)
+
+# Create a frame for the buttons at the bottom
+button_frame = tk.Frame(root)
+button_frame.pack(padx=10, pady=10, fill=tk.X, expand=False)
+
 # Create a send button
-send_button = tk.Button(root, text="Send", command=send_message)
-send_button.pack(padx=10, pady=10, side=tk.LEFT)
+send_button = tk.Button(button_frame, text="Send", command=send_message)
+send_button.pack(side=tk.LEFT, padx=5, pady=5)
 
 # Create a speech-to-text button
-speech_button = tk.Button(root, text="Speak", command=start_recognition_thread)
-speech_button.pack(padx=10, pady=10, side=tk.RIGHT)
+speech_button = tk.Button(button_frame, text="Speak", command=start_recognition_thread)
+speech_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
 # Create a checkbox to toggle text-to-speech
 tts_var = tk.BooleanVar()
-tts_checkbox = tk.Checkbutton(root, text="Enable Text-to-Speech", variable=tts_var)
-tts_checkbox.pack(padx=10, pady=10)
-
-# Set up a global hotkey for speech recognition using keyboard
-keyboard.add_hotkey('right ctrl', start_recognition_thread)
+tts_checkbox = tk.Checkbutton(button_frame, text="Enable Text-to-Speech", variable=tts_var)
+tts_checkbox.pack(side=tk.LEFT, padx=5, pady=5)
 
 # Run the application
 root.mainloop()
