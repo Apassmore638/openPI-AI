@@ -34,13 +34,8 @@ $pyenv_root exec pip install tk pillow pyttsx3 speechrecognition pyautogui keybo
 # Unset the Python version
 $pyenv_root shell --unset
 
-# Copy the updated testchat.py and image_interpreter.py to the installation directory
-install_dir="$HOME/open-interpreter"
-mkdir -p $install_dir
-cp testchat.py $install_dir
-cp image_interpreter.py $install_dir
 
 echo ""
 echo "Open Interpreter has been installed. Run the following command to use it: "
 echo ""
-echo "cd $install_dir && $pyenv_root shell $python_version && python testchat.py"
+echo "python testchat.py"
