@@ -1,12 +1,14 @@
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, filedialog
 from interpreter import interpreter
+import os
 import speech_recognition as sr
 import threading
-import os
 import pyttsx3
 import argparse
-import keyboard  # Using keyboard library for key bindings
+import keyboard
+from image_interpreter import encode_image_to_base64, create_image_message
+import pyautogui
 
 # Argument parsing
 parser = argparse.ArgumentParser(description="Open Interpreter Chat UI")
@@ -19,9 +21,7 @@ interpreter.llm.api_base = os.getenv('API_BASE')
 interpreter.llm.api_type = os.getenv('API_TYPE')
 interpreter.llm.api_version = os.getenv('API_VERSION')
 interpreter.llm.model = os.getenv('MODEL')
-
-# Print the model to ensure it is set correctly
-print(f"Model set to: {interpreter.llm.model}")
+interpreter.llm.supports_vision = True
 
 # Set the operating system if provided
 if args.os:
@@ -30,7 +30,9 @@ if args.os:
 # Initialize text-to-speech engine
 tts_engine = pyttsx3.init()
 
-def send_message(event=None):  # Modified to accept an optional event parameter
+selected_image_path = None
+
+def send_message():
     user_input = input_box.get("1.0", tk.END).strip()
     if user_input:
         chat_window.config(state=tk.NORMAL)
@@ -38,7 +40,14 @@ def send_message(event=None):  # Modified to accept an optional event parameter
         chat_window.config(state=tk.DISABLED)
         input_box.delete("1.0", tk.END)
         
-        response = get_interpreter_response(user_input)
+        if selected_image_path:
+            encoded_image = encode_image_to_base64(selected_image_path)
+            message = create_image_message(encoded_image)
+            message[0]['content'] = user_input
+        else:
+            message = user_input
+        
+        response = get_interpreter_response(message)
         chat_window.config(state=tk.NORMAL)
         chat_window.insert(tk.END, "Bot: " + response + "\n")
         chat_window.config(state=tk.DISABLED)
@@ -89,44 +98,50 @@ def recognize_speech():
 def start_recognition_thread():
     threading.Thread(target=recognize_speech).start()
 
+def select_image():
+    global selected_image_path
+    selected_image_path = filedialog.askopenfilename()
+    if selected_image_path:
+        chat_window.config(state=tk.NORMAL)
+        chat_window.insert(tk.END, "System: Image selected\n")
+        chat_window.config(state=tk.DISABLED)
+        chat_window.yview(tk.END)
+
 # Set up the main application window
 root = tk.Tk()
 root.title("Chat UI")
 
 # Bind Ctrl+C to the interrupt function
 root.bind('<Control-c>', interrupt)
-
-# Create a frame to hold the chat window and the input box
-main_frame = tk.Frame(root)
-main_frame.pack(fill=tk.BOTH, expand=True)
+root.bind('<Return>', send_message)
 
 # Create a scrolled text widget for the chat window
-chat_window = scrolledtext.ScrolledText(main_frame, wrap=tk.WORD, state=tk.DISABLED)
+chat_window = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED)
 chat_window.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
 # Create a text widget for user input
-input_box = tk.Text(main_frame, height=3)
+input_box = tk.Text(root, height=3)
 input_box.pack(padx=10, pady=10, fill=tk.X, expand=False)
 
-# Bind the Enter key to send_message
-keyboard.add_hotkey('enter', send_message)
-
-# Create a frame for the buttons at the bottom
-button_frame = tk.Frame(root)
-button_frame.pack(padx=10, pady=10, fill=tk.X, expand=False)
-
 # Create a send button
-send_button = tk.Button(button_frame, text="Send", command=send_message)
-send_button.pack(side=tk.LEFT, padx=5, pady=5)
+send_button = tk.Button(root, text="Send", command=send_message)
+send_button.pack(padx=10, pady=10, side=tk.LEFT)
 
 # Create a speech-to-text button
-speech_button = tk.Button(button_frame, text="Speak", command=start_recognition_thread)
-speech_button.pack(side=tk.RIGHT, padx=5, pady=5)
+speech_button = tk.Button(root, text="Speak", command=start_recognition_thread)
+speech_button.pack(padx=10, pady=10, side=tk.RIGHT)
+
+# Create a button to select an image
+image_button = tk.Button(root, text="Attach Image", command=select_image)
+image_button.pack(padx=10, pady=10, side=tk.RIGHT)
 
 # Create a checkbox to toggle text-to-speech
 tts_var = tk.BooleanVar()
-tts_checkbox = tk.Checkbutton(button_frame, text="Enable Text-to-Speech", variable=tts_var)
-tts_checkbox.pack(side=tk.LEFT, padx=5, pady=5)
+tts_checkbox = tk.Checkbutton(root, text="Enable Text-to-Speech", variable=tts_var)
+tts_checkbox.pack(padx=10, pady=10)
+
+# Set up a global hotkey for speech recognition
+keyboard.add_hotkey('alt', start_recognition_thread)
 
 # Run the application
 root.mainloop()
