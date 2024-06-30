@@ -29,7 +29,7 @@ $pyenv_root shell $python_version
 
 # Install necessary Python packages
 $pyenv_root exec pip install open-interpreter --break-system-packages
-$pyenv_root exec pip install tkinter pillow pyttsx3 speechrecognition pyautogui keyboard
+$pyenv_root exec pip install tk pillow pyttsx3 speechrecognition pyautogui keyboard
 
 # Unset the Python version
 $pyenv_root shell --unset
