@@ -5,6 +5,10 @@ sleep 2
 echo "This will take approximately 5 minutes..."
 sleep 2
 
+# Install system dependencies
+sudo apt-get update
+sudo apt-get install -y git curl tk-dev build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget llvm libncurses5-dev libncursesw5-dev xz-utils libffi-dev liblzma-dev python-openssl
+
 # Check if Rust is installed
 if ! command -v rustc &> /dev/null
 then
@@ -29,7 +33,7 @@ $pyenv_root shell $python_version
 
 # Install necessary Python packages
 $pyenv_root exec pip install open-interpreter --break-system-packages
-$pyenv_root exec pip install tk pillow pyttsx3 speechrecognition pyautogui keyboard
+$pyenv_root exec pip install tkinter pillow pyttsx3 speechrecognition pyautogui keyboard
 
 # Unset the Python version
 $pyenv_root shell --unset
