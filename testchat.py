@@ -18,7 +18,6 @@ args = parser.parse_args()
 # Configure the interpreter to use Azure OpenAI Service with environment variables
 interpreter.llm.api_key = os.getenv('API_KEY')
 interpreter.llm.api_base = os.getenv('API_BASE')
-interpreter.llm.api_type = os.getenv('API_TYPE')
 interpreter.llm.api_version = os.getenv('API_VERSION')
 interpreter.llm.model = os.getenv('MODEL')
 interpreter.llm.supports_vision = True
@@ -114,6 +113,7 @@ root.title("Chat UI")
 # Bind Ctrl+C to the interrupt function
 root.bind('<Control-c>', interrupt)
 root.bind('<Return>', send_message)
+root.bind('<Alt>', start_recognition_thread)
 
 # Create a scrolled text widget for the chat window
 chat_window = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED)
@@ -139,9 +139,6 @@ image_button.pack(padx=10, pady=10, side=tk.RIGHT)
 tts_var = tk.BooleanVar()
 tts_checkbox = tk.Checkbutton(root, text="Enable Text-to-Speech", variable=tts_var)
 tts_checkbox.pack(padx=10, pady=10)
-
-# Set up a global hotkey for speech recognition
-keyboard.add_hotkey('alt', start_recognition_thread)
 
 # Run the application
 root.mainloop()

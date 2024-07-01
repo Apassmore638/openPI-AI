@@ -5,46 +5,29 @@ sleep 2
 echo "This will take approximately 5 minutes..."
 sleep 2
 
-# Install system dependencies
-sudo apt-get update
-sudo apt-get install -y git curl tk-dev build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget llvm libncurses5-dev libncursesw5-dev xz-utils libffi-dev liblzma-dev python-openssl
+# Clone the repository
+git clone https://github.com/Apassmore638/openPI-AI.git
 
-# Check if Rust is installed
-if ! command -v rustc &> /dev/null
-then
-    echo "Rust is not installed. Installing now..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-else
-    echo "Rust is already installed."
-fi
+# Set up a virtual environment
+python3 -m venv opai
 
-# Install pyenv
-curl https://pyenv.run | bash
+# Activate the virtual environment
+source opai/bin/activate
 
-# Define pyenv location
-pyenv_root="$HOME/.pyenv/bin/pyenv"
+# Install the necessary packages
+pip install open-interpreter
+pip install tk pillow pyttsx3 speechrecognition pyautogui keyboard
 
-python_version="3.11.7"
+# Change directory to openPI-AI
+cd openPI-AI
 
-# Install specific Python version using pyenv
-$pyenv_root init
-$pyenv_root install $python_version --skip-existing
-$pyenv_root shell $python_version
+# Install portaudio
+sudo apt-get install portaudio19-dev
 
-# Install necessary Python packages
-$pyenv_root exec pip install open-interpreter --break-system-packages
-$pyenv_root exec pip install tkinter pillow pyttsx3 speechrecognition pyautogui keyboard
-
-# Unset the Python version
-$pyenv_root shell --unset
-
-# Initialize pyenv in the shell configuration file
-shell_config="$HOME/.bashrc"
-echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> $shell_config
-echo 'eval "$(pyenv init --path)"' >> $shell_config
-echo 'eval "$(pyenv init -)"' >> $shell_config
+# Install pyaudio
+pip install pyaudio
 
 echo ""
 echo "Open Interpreter has been installed. Run the following command to use it: "
 echo ""
-echo "source $shell_config && cd $(pwd) && $pyenv_root shell $python_version && python testchat.py"
+echo "source opai/bin/activate && python testchat.py"
