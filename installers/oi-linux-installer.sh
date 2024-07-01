@@ -5,9 +5,6 @@ sleep 2
 echo "This will take approximately 5 minutes..."
 sleep 2
 
-# Clone the repository
-git clone https://github.com/Apassmore638/openPI-AI.git
-
 # Set up a virtual environment
 python3 -m venv opai
 
@@ -18,8 +15,6 @@ source opai/bin/activate
 pip install open-interpreter
 pip install tk pillow pyttsx3 speechrecognition pyautogui keyboard
 
-# Change directory to openPI-AI
-cd openPI-AI
 
 # Install portaudio
 sudo apt-get install portaudio19-dev
