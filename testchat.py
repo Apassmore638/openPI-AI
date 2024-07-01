@@ -113,7 +113,7 @@ root.title("Chat UI")
 # Bind Ctrl+C to the interrupt function
 root.bind('<Control-c>', interrupt)
 root.bind('<Return>', send_message)
-root.bind('<Alt>', start_recognition_thread)
+root.bind('<Alt_L>', start_recognition_thread)
 
 # Create a scrolled text widget for the chat window
 chat_window = scrolledtext.ScrolledText(root, wrap=tk.WORD, state=tk.DISABLED)
