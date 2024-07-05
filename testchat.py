@@ -9,6 +9,7 @@ import argparse
 import keyboard
 from image_interpreter import encode_image_to_base64, create_image_message
 import pyautogui
+from query_vector_database import query_vector_database
 
 # Argument parsing
 parser = argparse.ArgumentParser(description="Open Interpreter Chat UI")
@@ -31,7 +32,18 @@ tts_engine = pyttsx3.init()
 
 selected_image_path = None
 
-def send_message():
+
+
+def is_relevant_context(context_text):
+    """Check if the context is relevant by ensuring it contains meaningful content."""
+    return context_text and len(context_text.strip()) > 0
+
+def sanitize_context(context_text):
+    """Sanitize context to ensure it is safe to use."""
+    sanitized_text = context_text.replace("\n", " ").replace("\r", " ").strip()
+    return sanitized_text[:500]  # Limit context text length for testing
+
+def send_message(event=None):
     user_input = input_box.get("1.0", tk.END).strip()
     if user_input:
         chat_window.config(state=tk.NORMAL)
@@ -46,7 +58,24 @@ def send_message():
         else:
             message = user_input
         
-        response = get_interpreter_response(message)
+        # Query the skills database
+        query_text = user_input
+        context_text, sources = query_vector_database(query_text)
+        
+        
+        # Determine the response based on the relevance of the context
+        if is_relevant_context(context_text):
+            sanitized_context = sanitize_context(context_text)
+            try:
+                response = get_interpreter_response(sanitized_context)
+            except Exception as e:
+                response = "There was an error processing your request. Please try again."
+        else:
+            try:
+                response = get_interpreter_response(query_text)
+            except Exception as e:
+                response = "There was an error processing your request. Please try again."
+        
         chat_window.config(state=tk.NORMAL)
         chat_window.insert(tk.END, "Bot: " + response + "\n")
         chat_window.config(state=tk.DISABLED)
@@ -55,6 +84,8 @@ def send_message():
         if tts_var.get():
             tts_engine.say(response)
             tts_engine.runAndWait()
+
+
 
 def get_interpreter_response(prompt):
     # Call the interpreter's chat method with the user's prompt
