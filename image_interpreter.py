@@ -1,6 +1,7 @@
 import base64
 from PIL import Image
 import io
+import os
 from interpreter import interpreter
 
 def encode_image_to_base64(image_path):
@@ -25,7 +26,7 @@ def send_image_to_interpreter(image_path):
     message = create_image_message(encoded_image)
     
     interpreter.llm.supports_vision = True
-    interpreter.llm.model = "gpt-4"  # Update to the correct model
+    interpreter.llm.model = os.getenv('MODEL')
     
     response = interpreter.chat(message)
     return response
