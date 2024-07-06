@@ -18,9 +18,7 @@ use these if they will help answer the question: {question}
 RELEVANCE_THRESHOLD = 0.7  # Set your relevance threshold here
 
 def query_vector_database(query_text):
-    with open(os.path.expanduser("~/Desktop/key.txt"), "r") as key_file:
-        os.environ["OPENAI_API_KEY"] = key_file.read().strip()
-        openai.api_key = os.environ["OPENAI_API_KEY"]
+    openai.api_key = os.environ["OPENAI_API_KEY"]
 
     # Prepare the DB.
     embedding_function = OpenAIEmbeddings(openai_api_key=openai.api_key)

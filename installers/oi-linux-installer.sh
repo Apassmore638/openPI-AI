@@ -13,7 +13,7 @@ source opai/bin/activate
 
 # Install the necessary packages
 pip install open-interpreter
-pip install tk pillow pyttsx3 speechrecognition pyautogui keyboard
+pip install tk pillow pyttsx3 speechrecognition pyautogui keyboard langchain_community langchain_openai
 
 
 # Install portaudio
