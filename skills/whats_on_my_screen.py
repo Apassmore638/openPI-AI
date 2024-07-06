@@ -29,6 +29,9 @@ def send_image_to_interpreter(image_path):
     message = create_image_message(encoded_image)
     
     interpreter.llm.supports_vision = True
+    interpreter.llm.api_key = os.getenv('API_KEY')
+    interpreter.llm.api_base = os.getenv('API_BASE')
+    interpreter.llm.api_version = os.getenv('API_VERSION')
     interpreter.llm.model = os.getenv('MODEL')
     
     response = interpreter.chat(message)
