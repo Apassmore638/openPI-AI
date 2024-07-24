@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, filedialog
+from tkinter import scrolledtext, filedialog, simpledialog, messagebox
 from interpreter import interpreter
 import os
 import speech_recognition as sr
@@ -10,29 +10,44 @@ import keyboard
 from image_interpreter import encode_image_to_base64, create_image_message
 import pyautogui
 from query_vector_database import query_vector_database
+import config  # Import the new config module
 
 # Argument parsing
 parser = argparse.ArgumentParser(description="Open Interpreter Chat UI")
 parser.add_argument('--os', type=str, help='Specify the operating system')
 args = parser.parse_args()
 
-# Configure the interpreter to use Azure OpenAI Service with environment variables
-interpreter.llm.api_key = os.getenv('API_KEY')
-interpreter.llm.api_base = os.getenv('API_BASE')
-interpreter.llm.api_version = os.getenv('API_VERSION')
-interpreter.llm.model = os.getenv('MODEL')
-interpreter.llm.supports_vision = True
-
-# Set the operating system if provided
-if args.os:
-    interpreter.os = args.os
-
 # Initialize text-to-speech engine
 tts_engine = pyttsx3.init()
 
 selected_image_path = None
 
+def configure_interpreter():
+    provider = simpledialog.askstring("Input", "Select provider (azure/openai):")
+    config.openai_key = simpledialog.askstring("Input", "Enter OpenAI API Key:")  # Update to use config
+    
+    if provider.lower() == "azure":
+        api_key = simpledialog.askstring("Input", "Enter Azure API Key:")
+        api_base = simpledialog.askstring("Input", "Enter Azure API Base:")
+        api_version = simpledialog.askstring("Input", "Enter Azure API Version:")
+        model = simpledialog.askstring("Input", "Enter Azure Model:")
+        interpreter.llm.api_key = api_key
+        interpreter.llm.api_base = api_base
+        interpreter.llm.api_version = api_version
+        interpreter.llm.model = model
+        interpreter.llm.supports_vision = True
+    elif provider.lower() == "openai":
+        model = simpledialog.askstring("Input", "Enter OpenAI Model:")
+        interpreter.llm.api_key = config.openai_key  # Update to use config
+        interpreter.llm.model = model
+        interpreter.llm.supports_vision = False
+    else:
+        messagebox.showerror("Error", "Invalid provider selected")
+        root.quit()
 
+# Set the operating system if provided
+if args.os:
+    interpreter.os = args.os
 
 def is_relevant_context(context_text):
     """Check if the context is relevant by ensuring it contains meaningful content."""
@@ -62,7 +77,6 @@ def send_message(event=None):
         query_text = user_input
         context_text, sources = query_vector_database(query_text)
         
-        
         # Determine the response based on the relevance of the context
         if is_relevant_context(context_text):
             sanitized_context = sanitize_context(context_text)
@@ -84,8 +98,6 @@ def send_message(event=None):
         if tts_var.get():
             tts_engine.say(response)
             tts_engine.runAndWait()
-
-
 
 def get_interpreter_response(prompt):
     # Call the interpreter's chat method with the user's prompt
@@ -140,6 +152,9 @@ def select_image():
 # Set up the main application window
 root = tk.Tk()
 root.title("Chat UI")
+
+# Configure the interpreter
+configure_interpreter()
 
 # Bind Ctrl+C to the interrupt function
 root.bind('<Control-c>', interrupt)

@@ -2,6 +2,8 @@ from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 import os
 import openai
+import config 
+
 
 CHROMA_PATH = "rag_files"
 
@@ -18,10 +20,10 @@ use these if they will help answer the question: {question}
 RELEVANCE_THRESHOLD = 0.7  # Set your relevance threshold here
 
 def query_vector_database(query_text):
-    openai.api_key = os.environ["OPENAI_API_KEY"]
+    openai_key = config.openai_key
 
     # Prepare the DB.
-    embedding_function = OpenAIEmbeddings(openai_api_key=openai.api_key)
+    embedding_function = OpenAIEmbeddings(openai_api_key=openai_key)
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
 
     # Search the DB.

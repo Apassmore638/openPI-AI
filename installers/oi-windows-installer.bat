@@ -22,4 +22,4 @@ pip install pyaudio
 echo.
 echo Open Interpreter has been installed. Run the following command to use it:
 echo.
-echo call opai\Scripts\activate.bat && python testchat.py
+echo call opai\Scripts\activate.bat && python chat.py
