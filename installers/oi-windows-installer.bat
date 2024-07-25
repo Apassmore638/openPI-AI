@@ -6,6 +6,20 @@ timeout /t 2
 echo This will take approximately 5 minutes...
 timeout /t 2
 
+REM Check if Python is installed
+python --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Python is not installed. Please install Python and try again.
+    exit /b 1
+)
+
+REM Check if venv is installed
+python -m venv --help >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Python venv is not installed. Installing venv...
+    python -m pip install --user virtualenv
+)
+
 REM Set up a virtual environment
 python -m venv opai
 
